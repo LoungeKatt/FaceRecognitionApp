@@ -7,13 +7,30 @@ android {
         applicationId 'com.lauszus.facerecognitionapp'
         minSdkVersion 15
         targetSdkVersion 24
-        versionCode 3
-        versionName '1.2'
+        versionCode 4
+        versionName '1.2.1'
         vectorDrawables.useSupportLibrary = true
         ndk {
-            abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86_64', 'x86'
+            abiFilters 'armeabi', 'armeabi-v7a', 'arm64-v8a', 'x86_64', 'x86'
             stl 'gnustl_static'
             cFlags '-std=gnu++11 -fexceptions -frtti'
+        }
+        setProperty('archivesBaseName', rootProject.name + '-' + defaultConfig.versionName)
+    }
+    splits {
+        abi {
+            enable true
+            reset()
+            universalApk true
+            include defaultConfig.ndk.abiFilters as String[]
+        }
+    }
+    applicationVariants.all { variant ->
+        if (variant.getBuildType().isMinifyEnabled()) {
+            variant.assemble.doLast {
+                variant.mappingFile.renameTo(variant.mappingFile.parent +
+                        "/$archivesBaseName-$variant.baseName-mapping.txt")
+            }
         }
     }
     signingConfigs {
